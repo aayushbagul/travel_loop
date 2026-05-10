@@ -14,6 +14,15 @@ import AdminPanel from './components/AdminPanel'
 import TripNotes from './components/TripNotes'
 import ExpenseInvoice from './components/ExpenseInvoice'
 
+// Simple auth guard — checks if token exists
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    return <Navigate to="/login" replace />
+  }
+  return children
+}
+
 function App() {
   return (
     <Router>
@@ -21,18 +30,22 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
-        <Route path="/home" element={<LandingPage />} />
-        <Route path="/create-trip" element={<CreateTrip />} />
-        <Route path="/build-itinerary" element={<BuildItinerary />} />
-        <Route path="/trips" element={<UserTripListing />} />
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/search" element={<ActivitySearch />} />
-        <Route path="/itinerary-view" element={<ItineraryView />} />
-        <Route path="/community" element={<CommunityTab />} />
-        <Route path="/packing-checklist" element={<PackingChecklist />} />
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/notes" element={<TripNotes />} />
-        <Route path="/invoice" element={<ExpenseInvoice />} />
+        <Route path="/home" element={<ProtectedRoute><LandingPage /></ProtectedRoute>} />
+        <Route path="/create-trip" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
+        <Route path="/build-itinerary" element={<ProtectedRoute><BuildItinerary /></ProtectedRoute>} />
+        <Route path="/build-itinerary/:tripId" element={<ProtectedRoute><BuildItinerary /></ProtectedRoute>} />
+        <Route path="/trips" element={<ProtectedRoute><UserTripListing /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+        <Route path="/search" element={<ProtectedRoute><ActivitySearch /></ProtectedRoute>} />
+        <Route path="/itinerary-view" element={<ProtectedRoute><ItineraryView /></ProtectedRoute>} />
+        <Route path="/itinerary-view/:tripId" element={<ProtectedRoute><ItineraryView /></ProtectedRoute>} />
+        <Route path="/community" element={<ProtectedRoute><CommunityTab /></ProtectedRoute>} />
+        <Route path="/packing-checklist" element={<ProtectedRoute><PackingChecklist /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+        <Route path="/notes" element={<ProtectedRoute><TripNotes /></ProtectedRoute>} />
+        <Route path="/notes/:tripId" element={<ProtectedRoute><TripNotes /></ProtectedRoute>} />
+        <Route path="/invoice" element={<ProtectedRoute><ExpenseInvoice /></ProtectedRoute>} />
+        <Route path="/invoice/:tripId" element={<ProtectedRoute><ExpenseInvoice /></ProtectedRoute>} />
       </Routes>
     </Router>
   )

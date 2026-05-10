@@ -1,18 +1,19 @@
 from fastapi import HTTPException
 from app.models.stop import Stop
 from app.models.city import City
+from app.models.user import User
 from app.schemas.stop import StopCreate, StopUpdate
 from app.services.trip_service import get_trip
 
-async def get_trip_stops(trip_id: int, user_id: int):
+async def get_trip_stops(trip_id: int, user: User):
     # Verify access via get_trip
-    await get_trip(trip_id, user_id)
+    await get_trip(trip_id, user)
     
     return await Stop.filter(trip_id=trip_id).prefetch_related('city').all()
 
-async def create_stop(trip_id: int, user_id: int, stop_data: StopCreate):
+async def create_stop(trip_id: int, user: User, stop_data: StopCreate):
     # Verify access (should really check for editor role, simplifying for now)
-    await get_trip(trip_id, user_id)
+    await get_trip(trip_id, user)
     
     city = await City.get_or_none(id=stop_data.city_id)
     if not city:
@@ -30,8 +31,8 @@ async def create_stop(trip_id: int, user_id: int, stop_data: StopCreate):
     await stop.fetch_related('city')
     return stop
 
-async def update_stop(trip_id: int, stop_id: int, user_id: int, stop_data: StopUpdate):
-    await get_trip(trip_id, user_id)
+async def update_stop(trip_id: int, stop_id: int, user: User, stop_data: StopUpdate):
+    await get_trip(trip_id, user)
     
     stop = await Stop.get_or_none(id=stop_id, trip_id=trip_id)
     if not stop:
@@ -44,8 +45,8 @@ async def update_stop(trip_id: int, stop_id: int, user_id: int, stop_data: StopU
     await stop.fetch_related('city')
     return stop
 
-async def delete_stop(trip_id: int, stop_id: int, user_id: int):
-    await get_trip(trip_id, user_id)
+async def delete_stop(trip_id: int, stop_id: int, user: User):
+    await get_trip(trip_id, user)
     
     stop = await Stop.get_or_none(id=stop_id, trip_id=trip_id)
     if not stop:
@@ -59,8 +60,8 @@ async def delete_stop(trip_id: int, stop_id: int, user_id: int):
         s.order = index + 1
         await s.save()
 
-async def reorder_stops(trip_id: int, user_id: int, stop_ids: list[int]):
-    await get_trip(trip_id, user_id)
+async def reorder_stops(trip_id: int, user: User, stop_ids: list[int]):
+    await get_trip(trip_id, user)
     
     stops = await Stop.filter(trip_id=trip_id).all()
     stop_map = {s.id: s for s in stops}

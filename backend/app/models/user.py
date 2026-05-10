@@ -12,6 +12,7 @@ class User(Model):
     
     is_active = fields.BooleanField(default=True)
     is_suspended = fields.BooleanField(default=False)
+    is_admin = fields.BooleanField(default=False)
 
     class Meta:
         table = "users"

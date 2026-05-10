@@ -10,7 +10,7 @@ router = APIRouter(prefix="/trips", tags=["Trips"])
 
 @router.get("", response_model=List[TripResponse])
 async def get_trips(current_user: User = Depends(get_current_user)):
-    return await trip_service.get_user_trips(current_user.id)
+    return await trip_service.get_user_trips(current_user)
 
 @router.post("", response_model=TripResponse, status_code=status.HTTP_201_CREATED)
 async def create_trip(trip_data: TripCreate, current_user: User = Depends(get_current_user)):
@@ -18,15 +18,15 @@ async def create_trip(trip_data: TripCreate, current_user: User = Depends(get_cu
 
 @router.get("/{trip_id}", response_model=TripResponse)
 async def get_trip(trip_id: int, current_user: User = Depends(get_current_user)):
-    return await trip_service.get_trip(trip_id, current_user.id)
+    return await trip_service.get_trip(trip_id, current_user)
 
 @router.put("/{trip_id}", response_model=TripResponse)
 async def update_trip(trip_id: int, trip_data: TripUpdate, current_user: User = Depends(get_current_user)):
-    return await trip_service.update_trip(trip_id, current_user.id, trip_data)
+    return await trip_service.update_trip(trip_id, current_user, trip_data)
 
 @router.delete("/{trip_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_trip(trip_id: int, current_user: User = Depends(get_current_user)):
-    await trip_service.delete_trip(trip_id, current_user.id)
+    await trip_service.delete_trip(trip_id, current_user)
 
 # Sharing
 @router.post("/{trip_id}/share", response_model=TripShareResponse)

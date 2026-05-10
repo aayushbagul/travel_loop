@@ -14,6 +14,7 @@ class UserResponse(UserBase):
     profile_photo: Optional[str] = None
     created_at: datetime
     is_active: bool
+    is_admin: bool
 
     class Config:
         from_attributes = True

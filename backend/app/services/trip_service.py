@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from app.models.trip import Trip
 from app.models.collaborator import Collaborator
+from app.models.user import User
 from app.schemas.trip import TripCreate, TripUpdate
 import uuid
 
@@ -8,37 +9,40 @@ async def create_trip(user_id: int, trip_data: TripCreate) -> Trip:
     trip = await Trip.create(user_id=user_id, **trip_data.model_dump())
     return trip
 
-async def get_user_trips(user_id: int):
+async def get_user_trips(user: User):
+    if user.is_admin:
+        return await Trip.all()
+        
     # Includes trips owned by user and trips shared with user
-    owned_trips = await Trip.filter(user_id=user_id).all()
+    owned_trips = await Trip.filter(user_id=user.id).all()
     
-    shared_collabs = await Collaborator.filter(user_id=user_id).prefetch_related('trip').all()
+    shared_collabs = await Collaborator.filter(user_id=user.id).prefetch_related('trip').all()
     shared_trips = [collab.trip for collab in shared_collabs]
     
     # Merge and remove duplicates if any
     all_trips = list({t.id: t for t in (owned_trips + shared_trips)}.values())
     return all_trips
 
-async def get_trip(trip_id: int, user_id: int) -> Trip:
+async def get_trip(trip_id: int, user: User) -> Trip:
     trip = await Trip.get_or_none(id=trip_id)
     if not trip:
         raise HTTPException(status_code=404, detail="Trip not found")
         
-    # Check access
-    if trip.user_id != user_id:
-        collab = await Collaborator.filter(trip_id=trip.id, user_id=user_id).first()
+    # Check access (Admins bypass)
+    if not user.is_admin and trip.user_id != user.id:
+        collab = await Collaborator.filter(trip_id=trip.id, user_id=user.id).first()
         if not collab:
             raise HTTPException(status_code=403, detail="Not authorized to view this trip")
             
     return trip
 
-async def update_trip(trip_id: int, user_id: int, trip_data: TripUpdate) -> Trip:
-    trip = await get_trip(trip_id, user_id) # Reuse access check
+async def update_trip(trip_id: int, user: User, trip_data: TripUpdate) -> Trip:
+    trip = await get_trip(trip_id, user) # Reuse access check
     
-    # Check if user is owner or editor
-    if trip.user_id != user_id:
-        collab = await Collaborator.filter(trip_id=trip.id, user_id=user_id).first()
-        if collab.role != "editor":
+    # Check if user is owner, admin or editor
+    if not user.is_admin and trip.user_id != user.id:
+        collab = await Collaborator.filter(trip_id=trip.id, user_id=user.id).first()
+        if not collab or collab.role != "editor":
             raise HTTPException(status_code=403, detail="Not authorized to edit this trip")
 
     update_data = trip_data.model_dump(exclude_unset=True)
@@ -46,13 +50,13 @@ async def update_trip(trip_id: int, user_id: int, trip_data: TripUpdate) -> Trip
         await trip.update_from_dict(update_data).save()
     return trip
 
-async def delete_trip(trip_id: int, user_id: int):
+async def delete_trip(trip_id: int, user: User):
     trip = await Trip.get_or_none(id=trip_id)
     if not trip:
         raise HTTPException(status_code=404, detail="Trip not found")
     
-    if trip.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Only the owner can delete a trip")
+    if not user.is_admin and trip.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Only the owner or admin can delete a trip")
         
     await trip.delete()
 

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import init_db, close_db
-from app.routers import auth, cities, activities, trips, stops, profile, dashboard, budget, packing, notes, admin, itinerary
+from app.routers import auth, cities, activities, trips, stops, profile, dashboard, budget, packing, notes, admin, itinerary, community
 
 app = FastAPI(title="Travel Loop API", version="1.0.0")
 
@@ -34,6 +34,7 @@ app.include_router(packing.router)
 app.include_router(notes.router)
 app.include_router(admin.router)
 app.include_router(itinerary.router)
+app.include_router(community.router)
 
 @app.get("/")
 async def root():

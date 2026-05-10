@@ -11,9 +11,8 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 
 # Simplified admin check
 async def get_admin_user(current_user: User = Depends(get_current_user)):
-    # In a real app, you'd check a role or flag. For this hackathon:
-    # if current_user.email != "admin@admin.com":
-    #     raise HTTPException(status_code=403, detail="Admin only")
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin only")
     return current_user
 
 @router.get("/stats", response_model=GlobalStats)

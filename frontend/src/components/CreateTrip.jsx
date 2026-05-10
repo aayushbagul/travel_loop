@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
+import { tripsApi, citiesApi } from '../api/client';
 import bannerImg from '../assets/travel_banner.png';
 import parisImg from '../assets/destination_paris.png';
 import tokyoImg from '../assets/destination_tokyo.png';
 
 export default function CreateTrip() {
   const navigate = useNavigate();
-  
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    start_date: '',
+    end_date: '',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const suggestions = [
     { id: 1, title: 'Eiffel Tower', location: 'Paris', img: parisImg },
     { id: 2, title: 'Shibuya Crossing', location: 'Tokyo', img: tokyoImg },
@@ -16,6 +25,38 @@ export default function CreateTrip() {
     { id: 5, title: 'Mount Fuji', location: 'Japan', img: tokyoImg },
     { id: 6, title: 'Positano Beach', location: 'Italy', img: bannerImg },
   ];
+
+  const handleChange = (field) => (e) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (!formData.title.trim()) {
+      setError('Trip name is required.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload = {
+        title: formData.title,
+        description: formData.description || null,
+        start_date: formData.start_date || null,
+        end_date: formData.end_date || null,
+      };
+      const response = await tripsApi.create(payload);
+      // Navigate to build itinerary with the new trip ID
+      navigate(`/build-itinerary/${response.data.id}`);
+    } catch (err) {
+      const detail = err.response?.data?.detail;
+      setError(typeof detail === 'string' ? detail : 'Failed to create trip.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-24">
@@ -30,31 +71,40 @@ export default function CreateTrip() {
           </div>
           
           <div className="p-6 sm:p-8">
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/build-itinerary'); }}>
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg font-medium border border-red-200">{error}</div>}
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-semibold text-slate-600 ml-1">Trip Name</label>
+                  <label className="text-sm font-semibold text-slate-600 ml-1">Trip Name <span className="text-red-400">*</span></label>
                   <input 
                     type="text" 
-                    placeholder="e.g. Summer Vacation in Europe" 
+                    placeholder="e.g. Summer Vacation in Europe"
+                    value={formData.title}
+                    onChange={handleChange('title')}
+                    required
                     className="w-full px-4 sm:px-5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-300"
                   />
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-semibold text-slate-600 ml-1">Select a Place</label>
-                  <input 
-                    type="text" 
-                    placeholder="Search for a city or country..." 
-                    className="w-full px-4 sm:px-5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-300"
+                  <label className="text-sm font-semibold text-slate-600 ml-1">Description</label>
+                  <textarea 
+                    placeholder="Describe your trip..."
+                    value={formData.description}
+                    onChange={handleChange('description')}
+                    rows="2"
+                    className="w-full px-4 sm:px-5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-300 resize-none"
                   />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-600 ml-1">Start Date</label>
                   <input 
-                    type="date" 
+                    type="date"
+                    value={formData.start_date}
+                    onChange={handleChange('start_date')}
                     className="w-full px-4 sm:px-5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-300"
                   />
                 </div>
@@ -62,7 +112,9 @@ export default function CreateTrip() {
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-600 ml-1">End Date</label>
                   <input 
-                    type="date" 
+                    type="date"
+                    value={formData.end_date}
+                    onChange={handleChange('end_date')}
                     className="w-full px-4 sm:px-5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-300"
                   />
                 </div>
@@ -71,10 +123,11 @@ export default function CreateTrip() {
               
               <div className="pt-4 flex justify-end">
                 <button 
-                  type="submit" 
-                  className="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all duration-300 transform hover:-translate-y-0.5"
+                  type="submit"
+                  disabled={loading}
+                  className="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all duration-300 transform hover:-translate-y-0.5"
                 >
-                  Create Trip
+                  {loading ? 'Creating...' : 'Create Trip'}
                 </button>
               </div>
             </form>
