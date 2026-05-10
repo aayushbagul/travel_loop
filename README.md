@@ -99,6 +99,44 @@ The project includes an automated test suite covering core functionalities using
 pytest tests/
 ```
 
+## Frontend Architecture
+
+The frontend is a dynamic, responsive Single Page Application (SPA) built with modern web technologies:
+
+- **Library**: [React 18](https://react.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/) (Fast and lean build system)
+- **Styling**: Tailwind CSS (Utility-first framework for rapid UI development)
+- **Routing**: React Router DOM (Client-side routing with protected routes)
+- **API Communication**: Axios (with interceptors for JWT token management)
+- **Icons**: Custom SVG icons and CSS animations
+
+### Frontend Features Implemented
+- **Dynamic Animations**: Custom CSS keyframes for animated logo loops, hover effects on buttons (like the `Create Trip` swirl button), and interactive UI states.
+- **Media Thumbnails**: Destination cards with video playback on hover.
+- **Protected Routing**: JWT token validation to restrict access to authenticated users.
+- **Responsive Layouts**: Fully mobile-responsive designs across all pages.
+- **Integration**: Full connection to backend REST endpoints for Auth, Profile management, Trip CRUD, Budget tracking, and more.
+
+### Frontend Setup & Installation
+
+1. **Navigate to the Frontend Directory**
+\`\`\`bash
+cd travel_loop/frontend
+\`\`\`
+
+2. **Install Dependencies**
+\`\`\`bash
+npm install
+\`\`\`
+
+3. **Running the Frontend Server**
+Start the development server using Vite:
+\`\`\`bash
+npm run dev
+\`\`\`
+- The application will be available at: `http://localhost:5173`
+- Ensure the FastAPI backend is running simultaneously on port 8000 for full functionality.
+
 ## API Modules
 
 The application is structured into domain-driven routers:
