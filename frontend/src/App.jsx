@@ -13,6 +13,7 @@ import PackingChecklist from './components/PackingChecklist'
 import AdminPanel from './components/AdminPanel'
 import TripNotes from './components/TripNotes'
 import ExpenseInvoice from './components/ExpenseInvoice'
+import bgVideo from './assets/bg.mp4'
 
 // Simple auth guard — checks if token exists
 function ProtectedRoute({ children }) {
@@ -26,6 +27,36 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <Router>
+      {/* ── Fixed looping background video ── */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'fixed',
+          top: 0, left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          zIndex: -1,
+          pointerEvents: 'none',
+        }}
+      >
+        <source src={bgVideo} type="video/mp4" />
+      </video>
+
+      {/* Subtle dark overlay so text remains readable */}
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(15, 23, 42, 0.45)',
+          zIndex: -1,
+          pointerEvents: 'none',
+        }}
+      />
+
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />

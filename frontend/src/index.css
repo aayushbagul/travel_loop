@@ -3,20 +3,12 @@
 @tailwind utilities;
 
 @layer utilities {
-  /* Hide scrollbar while keeping scrollability */
   .hide-scrollbar::-webkit-scrollbar { display: none; }
   .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* Text clamping */
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -24,34 +16,55 @@
 
 @layer base {
   * { box-sizing: border-box; }
-  
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background-color: #f8fafc; /* slate-50 */
-    color: #1e293b; /* slate-800 */
+    background: transparent !important;
+    color: #ffffff; /* Global White Text */
   }
 
-  /* Prevent horizontal overflow on mobile */
   body, #root { overflow-x: hidden; max-width: 100vw; }
 
-  /* Responsive images */
-  img { max-width: 100%; height: auto; }
+  /* Update all standard headings and paragraphs to white by default */
+  h1, h2, h3, h4, p, span, label {
+    color: #ffffff !important;
+  }
 
-  /* Nice select styling */
-  select { appearance: none; -webkit-appearance: none; }
+  /* Inputs need translucent dark backgrounds with white text */
+  input, textarea, select {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+  }
 }
 
-/* Animated blobs for auth pages */
+/* Glassmorphism for Cards and Containers - Changed to Grey */
+.bg-white, .bg-slate-50 {
+  background-color: rgba(30, 41, 59, 0.7) !important; /* Medium Grey (Slate-800) */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+}
+
+/* Translucent Navbar */
+header {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Animation Keyframes */
 @keyframes blob {
-  0%   { transform: translate(0px, 0px) scale(1); }
-  33%  { transform: translate(30px, -50px) scale(1.1); }
-  66%  { transform: translate(-20px, 20px) scale(0.9); }
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
   100% { transform: translate(0px, 0px) scale(1); }
 }
 .animate-blob { animation: blob 7s infinite; }
-.animation-delay-2000 { animation-delay: 2s; }
-.animation-delay-4000 { animation-delay: 4s; }
