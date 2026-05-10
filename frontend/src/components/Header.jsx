@@ -11,7 +11,11 @@ export default function Header() {
     { name: 'My Trips', path: '/trips' },
     { name: 'Community', path: '/community' },
     { name: 'Search', path: '/search' },
-    { name: 'Itinerary View', path: '/itinerary-view' }
+    { name: 'Itinerary View', path: '/itinerary-view' },
+    { name: 'Checklist', path: '/packing-checklist' },
+    { name: 'Notes', path: '/notes' },
+    { name: 'Invoice', path: '/invoice' },
+    { name: 'Admin', path: '/admin' }
   ];
 
   return (
