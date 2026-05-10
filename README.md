@@ -120,20 +120,20 @@ The frontend is a dynamic, responsive Single Page Application (SPA) built with m
 ### Frontend Setup & Installation
 
 1. **Navigate to the Frontend Directory**
-\`\`\`bash
+```bash
 cd travel_loop/frontend
-\`\`\`
+```
 
 2. **Install Dependencies**
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
-3. **Running the Frontend Server**
+4. **Running the Frontend Server**
 Start the development server using Vite:
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 - The application will be available at: `http://localhost:5173`
 - Ensure the FastAPI backend is running simultaneously on port 8000 for full functionality.
 
